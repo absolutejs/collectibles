@@ -16,3 +16,45 @@ can preserve historical output by pinning their recipe version and permutation n
 
 The library contains no pet artwork, game tiers, or database assumptions. Those remain
 application policy.
+
+## Installation
+
+```sh
+bun add @absolutejs/collectibles
+```
+
+## Deterministic editions and traits
+
+```ts
+import {
+  chooseWeightedEdition,
+  generateWeightedTraits,
+  printingId,
+  shuffledSerial,
+} from "@absolutejs/collectibles";
+
+const editions = [
+  { key: "standard", label: "Standard", supply: 900, weight: 90 },
+  { key: "rare", label: "Rare", supply: 100, weight: 10 },
+] as const;
+
+const edition = chooseWeightedEdition("subject:42", editions);
+const printing = printingId("set-1", "subject:42", edition);
+const serial = shuffledSerial(
+  printing,
+  1,
+  editions.find((row) => row.key === edition)!.supply,
+);
+
+const traits = generateWeightedTraits("subject:42", [
+  {
+    key: "background",
+    options: [
+      { value: "blue", weight: 80 },
+      { value: "gold", weight: 20 },
+    ],
+  },
+]);
+```
+
+The same seed, recipe version, and namespace always produce the same result. `populationReport()` explains issued, remaining, discovered, listed, and unavailable supply without requiring a particular marketplace or database.
